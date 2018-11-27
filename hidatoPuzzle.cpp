@@ -5,6 +5,7 @@
 */
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <iterator>
 #include <cmath>
@@ -14,7 +15,7 @@ using namespace std;
 class Solver {
 
 	const int dx[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
-	const int dy[8] = { -1,  0,  1,-1, 1, 1, 0,-1 };
+	const int dy[8] = { -1,  0,  1,-1, 1, -1, 0, 1 };
 	int row, col;
 	int max;
 	int* arr;
@@ -26,15 +27,17 @@ public:
     row = max_row;
 		col = max_col;
 
-		max = 0;
-		int count = 0;
-		int x, y;
-
 		arr = new int[row*col];
 		isCheckArr = new bool[row*col];
 
+
 		for (int i = 0; i <= row * col; i++)
 			isCheckArr[i] = 0;
+
+
+		max = 0;
+		int count = 0;
+		int x, y;
 
 		for (vector<int>::iterator i = puzz.begin(); i != puzz.end(); i++) { // puzzle 배열을 arr 배열에 복사, isCheckArr배열 변경 ,target 값 구하기
 
@@ -50,16 +53,20 @@ public:
 		}
 
 		findStartPoint(x, y); // 시작점 1의 인덱스 찾기
-		search(x, y, 2); // 값이 1인 인덱스에서부터 탐색 시작
+		bool solvecheck = search(x, y, 2); // 값이 1인 인덱스에서부터 탐색 시작
 
 		count = 0;
+		if (solvecheck){
 
-		for (vector<int>::iterator i = puzz.begin(); i != puzz.end(); i++) {
-			if ( (*i) == 0 )
-				(*i) = arr[ count ];
+			for (vector<int>::iterator i = puzz.begin(); i != puzz.end(); i++) {
+				if ( (*i) == 0 )
+					(*i) = arr[ count ];
 
-			count++;
+				count++;
+			}
 		}
+		else
+			cout << " 문제 해결 불가! " << endl;
 
 		delete[] arr;
 		delete[] isCheckArr;
@@ -86,7 +93,7 @@ public:
 
 	bool search(int x, int y, int nextPoint) { // 다음 경로 탐색 함수 , dfs로 구현
 
-    if (nextPoint == max)
+    if (nextPoint == max + 1)
       return true;
 
 		if ( isCheckArr[nextPoint] ) {
@@ -142,12 +149,17 @@ int main() {
 	cin.tie(NULL);
 	cout.tie(NULL);
 
+	ifstream in("solverinput.txt");
+	ofstream out("solveroutput.txt");
+
 	int testcases;
-	cin >> testcases;
+	//cin >> testcases;
+	in >> testcases;
 	while (testcases--) {
 
 		int input_row, input_col;
-		cin >> input_row >> input_col;
+		//cin >> input_row >> input_col;
+		in >> input_row >> input_col;
 
 		Solver S;
 
@@ -159,7 +171,7 @@ int main() {
 
 			int add_num;
 
-			cin >> add_num;
+			in >> add_num;
 			puzz.push_back(add_num);
 
 		}
@@ -173,19 +185,22 @@ int main() {
 			k++;
 
 			if ( (*i) != -1 && (*i) != 0 )
-				cout << (*i) << " ";
+				out << (*i) << " ";
 
 			else
-				cout << -1 << " ";
+				out << -1 << " ";
 
 			if ( k == input_row ) {
-				cout << endl;
+				out << endl;
 				k = 0;
 			}
 		}
 
-		cout << endl;
+		out << endl;
 	}
 
+	in.close();
+	out.close();
 	return 0;
 }
+
